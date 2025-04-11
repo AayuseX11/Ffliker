@@ -3,136 +3,256 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Liker - Redirect</title>
+    <title>Free Fire Likes - Processing</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            background: linear-gradient(135deg, #ff5f6d, #ffc371);
+            color: #fff;
+            text-align: center;
             margin: 0;
             padding: 0;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
         }
         .container {
-            background-color: white;
-            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 90%;
-            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         h1 {
-            color: #ff5722;
-            margin-top: 0;
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #ffc371;
         }
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #ff5722;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 30px auto;
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .progress-container {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
         }
-        .message {
+        .progress-bar {
+            width: 0%;
+            height: 8px;
+            background-color: #ffc371;
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+        }
+        .status {
             font-size: 18px;
+            font-weight: bold;
             margin-bottom: 20px;
         }
         .details {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 6px;
-            margin-top: 20px;
-            text-align: left;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 25px;
         }
-        .detail-item {
-            margin-bottom: 10px;
-        }
-        .label {
+        .btn {
+            background-color: #ffc371;
+            color: #333;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin: 10px;
             display: inline-block;
-            width: 100px;
+        }
+        .btn:hover {
+            background-color: #ffb84d;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Free Fire Liker</h1>
-        <div class="loader" id="loader"></div>
-        <div class="message" id="message">Processing your request...</div>
+        <h1>Free Fire Likes Processing</h1>
+        <p>We're sending likes to your Free Fire account. Please wait while we process your request.</p>
         
-        <div class="details">
-            <div class="detail-item">
-                <span class="label">UID:</span>
-                <span id="uid-display">-</span>
-            </div>
-            <div class="detail-item">
-                <span class="label">Likes:</span>
-                <span id="likes-display">-</span>
-            </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
         </div>
         
-        <div id="result" style="display:none; margin-top: 20px;">
-            <div id="result-message" style="font-size: 18px; font-weight: bold; color: #4caf50;"></div>
-            <div id="transaction-id" style="margin-top: 10px; font-family: monospace; background: #f1f1f1; padding: 5px; border-radius: 4px; display: inline-block;"></div>
+        <div class="status" id="status-text">Initializing...</div>
+        <div class="details" id="details-text">Transaction ID: <span id="transaction-id">Loading...</span></div>
+        
+        <div id="manual-captcha" class="hidden">
+            <p>Please complete the captcha to continue:</p>
+            <div id="captcha-container"></div>
+            <button class="btn" id="submit-captcha">Submit Captcha</button>
+        </div>
+        
+        <div id="success-container" class="hidden">
+            <p>Likes have been sent to your account!</p>
+            <a href="/" class="btn">Send More Likes</a>
+            <a href="#" id="check-status-btn" class="btn">Check Status</a>
+        </div>
+        
+        <div id="error-container" class="hidden">
+            <p>There was a problem processing your request.</p>
+            <p id="error-message"></p>
+            <button class="btn" id="retry-btn">Try Again</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Extract parameters from URL (domain.com/redirect.html?uid=123&amount=100)
-            const urlParams = new URLSearchParams(window.location.search);
-            const uid = urlParams.get('uid');
-            const amount = urlParams.get('amount');
-            
-            // Display the parameters
-            document.getElementById('uid-display').textContent = uid || 'Not provided';
-            document.getElementById('likes-display').textContent = amount || 'Not provided';
-            
-            // If both parameters are provided, make the API call
-            if (uid && amount) {
-                // Construct API URL
-                const apiUrl = `/uid=${uid}&amount=${amount}`;
+        // Parse URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const transactionId = urlParams.get('transactionId');
+        const uid = urlParams.get('uid');
+        
+        document.getElementById('transaction-id').textContent = transactionId || 'Not available';
+        
+        // Set up progress bar animation
+        const progressBar = document.getElementById('progress-bar');
+        const statusText = document.getElementById('status-text');
+        let progress = 0;
+        
+        function updateProgress(newProgress, status) {
+            if (newProgress > progress) {
+                progress = newProgress;
+                progressBar.style.width = `${progress}%`;
                 
-                // Make the request
-                fetch(apiUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Hide loader
-                        document.getElementById('loader').style.display = 'none';
-                        
-                        if (data.status === 'success') {
-                            // Show success message
-                            document.getElementById('message').textContent = 'Your likes have been sent successfully!';
-                            document.getElementById('result').style.display = 'block';
-                            document.getElementById('result-message').textContent = 'Transaction completed';
-                            document.getElementById('transaction-id').textContent = 'Transaction ID: ' + data.data.transactionId;
-                        } else {
-                            // Show error message
-                            document.getElementById('message').textContent = 'Error: ' + (data.message || 'Unknown error');
-                            document.getElementById('message').style.color = '#f44336';
-                        }
-                    })
-                    .catch(error => {
-                        // Hide loader and show error
-                        document.getElementById('loader').style.display = 'none';
-                        document.getElementById('message').textContent = 'Error connecting to the server. Please try again.';
-                        document.getElementById('message').style.color = '#f44336';
-                        console.error('Error:', error);
-                    });
-            } else {
-                // Hide loader and show error if parameters are missing
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('message').textContent = 'Missing UID or amount parameters. Please check your link.';
-                document.getElementById('message').style.color = '#f44336';
+                if (status) {
+                    statusText.textContent = status;
+                }
             }
+        }
+        
+        // Start initial animation
+        updateProgress(10, 'Connecting to server...');
+        
+        // Function to check transaction status
+        async function checkTransactionStatus() {
+            if (!transactionId) {
+                showError('No transaction ID found. Please try again.');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/status/${transactionId}`);
+                const data = await response.json();
+                
+                if (data.status === 'error') {
+                    showError(data.message);
+                    return;
+                }
+                
+                const transaction = data.data;
+                
+                switch(transaction.status) {
+                    case 'processing':
+                        updateProgress(30, 'Processing your request...');
+                        setTimeout(checkTransactionStatus, 2000);
+                        break;
+                    
+                    case 'captcha_required':
+                        updateProgress(50, 'Captcha verification required');
+                        showCaptcha();
+                        break;
+                    
+                    case 'completed':
+                    case 'completed_simulated':
+                        updateProgress(100, 'Completed!');
+                        showSuccess();
+                        break;
+                    
+                    case 'failed':
+                        showError(transaction.error || 'Failed to process your request');
+                        break;
+                    
+                    default:
+                        updateProgress(60, `Status: ${transaction.status}`);
+                        setTimeout(checkTransactionStatus, 2000);
+                }
+            } catch (error) {
+                showError('Could not connect to server. Please try again later.');
+                console.error('Error checking status:', error);
+            }
+        }
+        
+        function showCaptcha() {
+            document.getElementById('manual-captcha').classList.remove('hidden');
+            
+            // Here you would normally load a captcha widget
+            const captchaContainer = document.getElementById('captcha-container');
+            captchaContainer.innerHTML = '<div style="background:#eee;padding:20px;margin:10px 0;border-radius:5px;">Captcha would appear here</div>';
+            
+            document.getElementById('submit-captcha').addEventListener('click', submitCaptcha);
+        }
+        
+        async function submitCaptcha() {
+            // Here you would normally get the captcha token
+            const captchaToken = 'simulated-captcha-token';
+            
+            try {
+                const response = await fetch('/api/manual-submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        uid: uid,
+                        transactionId: transactionId,
+                        captchaToken: captchaToken
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    document.getElementById('manual-captcha').classList.add('hidden');
+                    updateProgress(80, 'Captcha verified, completing request...');
+                    setTimeout(checkTransactionStatus, 1500);
+                } else {
+                    showError(data.message || 'Failed to verify captcha');
+                }
+            } catch (error) {
+                showError('Error submitting captcha');
+                console.error('Error submitting captcha:', error);
+            }
+        }
+        
+        function showSuccess() {
+            document.getElementById('success-container').classList.remove('hidden');
+            document.getElementById('check-status-btn').href = `/api/user/${uid}`;
+        }
+        
+        function showError(message) {
+            document.getElementById('error-container').classList.remove('hidden');
+            document.getElementById('error-message').textContent = message || 'Unknown error occurred';
+            progressBar.style.backgroundColor = '#ff5f6d';
+        }
+        
+        // Start checking status
+        if (transactionId) {
+            setTimeout(checkTransactionStatus, 1000);
+        } else {
+            showError('No transaction ID provided');
+        }
+        
+        // Retry button functionality
+        document.getElementById('retry-btn').addEventListener('click', function() {
+            window.location.href = '/';
         });
     </script>
 </body>
