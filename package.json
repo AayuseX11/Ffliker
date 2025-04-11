@@ -1,7 +1,7 @@
 {
   "name": "free-fire-liker-api",
   "version": "1.0.0",
-  "description": "API for Free Fire likes service",
+  "description": "API for sending likes to Free Fire accounts (for educational purposes only)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -9,22 +9,26 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "free-fire",
+    "free fire",
     "api",
-    "likes"
+    "likes",
+    "web automation"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.6.2",
+    "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "express": "^4.18.2",
-    "express-rate-limit": "^7.1.5",
+    "express-rate-limit": "^7.1.4",
+    "puppeteer": "^21.5.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.0.3"
+    "nodemon": "^3.0.1"
   },
   "engines": {
-    "node": ">=14.0.0"
+    "node": ">=16.0.0"
   }
 }
