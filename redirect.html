@@ -3,80 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free Fire Likes - Processing</title>
+    <title>Free Fire Liker - Processing</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ff5f6d, #ffc371);
-            color: #fff;
+            background-color: #232323;
+            color: #f5f5f5;
             text-align: center;
             margin: 0;
             padding: 0;
-            height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-image: linear-gradient(to bottom right, #232323, #101010);
         }
         .container {
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
             padding: 30px;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background-color: rgba(20, 20, 20, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin: 20px;
+        }
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
         }
         h1 {
-            font-size: 28px;
+            color: #ff5722;
             margin-bottom: 20px;
-            color: #ffc371;
+            font-size: 26px;
         }
-        p {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 25px;
+        .status {
+            margin: 30px 0;
+            font-size: 18px;
         }
         .progress-container {
             width: 100%;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            margin-bottom: 30px;
+            background: #333;
+            border-radius: 20px;
+            height: 20px;
+            margin: 20px 0;
             overflow: hidden;
         }
         .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #ff5722, #ff9800);
+            border-radius: 20px;
             width: 0%;
-            height: 8px;
-            background-color: #ffc371;
-            border-radius: 10px;
             transition: width 1s ease-in-out;
         }
-        .status {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
+        .info {
+            padding: 20px;
+            background: rgba(255, 87, 34, 0.1);
+            border-left: 4px solid #ff5722;
+            text-align: left;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
         }
-        .details {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 25px;
+        .detail {
+            margin: 5px 0;
+            color: #cccccc;
         }
         .btn {
-            background-color: #ffc371;
-            color: #333;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            margin: 10px;
             display: inline-block;
+            background: #ff5722;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
         }
         .btn:hover {
-            background-color: #ffb84d;
+            background: #ff9800;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 15px rgba(255, 87, 34, 0.4);
         }
         .hidden {
             display: none;
@@ -85,175 +92,80 @@
 </head>
 <body>
     <div class="container">
-        <h1>Free Fire Likes Processing</h1>
-        <p>We're sending likes to your Free Fire account. Please wait while we process your request.</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cGF0aCBmaWxsPSIjZmY1NzIyIiBkPSJNNTAgMTBMMTAgNTBsMTUgMTVoMTB2MjBoMzBWNjVoMTBsMTUtMTVaIi8+PHBhdGggZmlsbD0iI2ZmOTgwMCIgZD0ibTUwIDEwIDQwIDQwLTE1IDE1SDY1djIwSDM1VjY1SDI1TDEwIDUwWiIgZmlsbC1vcGFjaXR5PSIuNSIvPjwvc3ZnPg==" class="logo" alt="Logo">
+        <h1>Free Fire Liker</h1>
         
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
+        <div class="status" id="processing">
+            <p>Your request is being processed...</p>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress"></div>
+            </div>
         </div>
         
-        <div class="status" id="status-text">Initializing...</div>
-        <div class="details" id="details-text">Transaction ID: <span id="transaction-id">Loading...</span></div>
-        
-        <div id="manual-captcha" class="hidden">
-            <p>Please complete the captcha to continue:</p>
-            <div id="captcha-container"></div>
-            <button class="btn" id="submit-captcha">Submit Captcha</button>
+        <div class="info hidden" id="result">
+            <div class="detail">UID: <span id="uid">--</span></div>
+            <div class="detail">Amount: <span id="amount">--</span> likes</div>
+            <div class="detail">Status: <span id="status">--</span></div>
+            <div class="detail">Transaction ID: <span id="transactionId">--</span></div>
         </div>
         
-        <div id="success-container" class="hidden">
-            <p>Likes have been sent to your account!</p>
-            <a href="/" class="btn">Send More Likes</a>
-            <a href="#" id="check-status-btn" class="btn">Check Status</a>
-        </div>
-        
-        <div id="error-container" class="hidden">
-            <p>There was a problem processing your request.</p>
-            <p id="error-message"></p>
-            <button class="btn" id="retry-btn">Try Again</button>
-        </div>
+        <a href="/" class="btn hidden" id="homeBtn">Back to Home</a>
     </div>
 
     <script>
-        // Parse URL params
+        // Parse URL parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const transactionId = urlParams.get('transactionId');
-        const uid = urlParams.get('uid');
+        const transactionId = urlParams.get('txid');
         
-        document.getElementById('transaction-id').textContent = transactionId || 'Not available';
-        
-        // Set up progress bar animation
-        const progressBar = document.getElementById('progress-bar');
-        const statusText = document.getElementById('status-text');
-        let progress = 0;
-        
-        function updateProgress(newProgress, status) {
-            if (newProgress > progress) {
-                progress = newProgress;
+        if (!transactionId) {
+            document.getElementById('processing').innerHTML = '<p>Error: No transaction ID provided</p>';
+        } else {
+            // Update progress bar animation
+            let progress = 0;
+            const progressBar = document.getElementById('progress');
+            
+            const progressInterval = setInterval(() => {
+                progress += 1;
                 progressBar.style.width = `${progress}%`;
                 
-                if (status) {
-                    statusText.textContent = status;
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    checkStatus();
                 }
-            }
-        }
-        
-        // Start initial animation
-        updateProgress(10, 'Connecting to server...');
-        
-        // Function to check transaction status
-        async function checkTransactionStatus() {
-            if (!transactionId) {
-                showError('No transaction ID found. Please try again.');
-                return;
-            }
+            }, 250); // Complete in about 25 seconds
             
-            try {
-                const response = await fetch(`/api/status/${transactionId}`);
-                const data = await response.json();
-                
-                if (data.status === 'error') {
-                    showError(data.message);
-                    return;
-                }
-                
-                const transaction = data.data;
-                
-                switch(transaction.status) {
-                    case 'processing':
-                        updateProgress(30, 'Processing your request...');
-                        setTimeout(checkTransactionStatus, 2000);
-                        break;
-                    
-                    case 'captcha_required':
-                        updateProgress(50, 'Captcha verification required');
-                        showCaptcha();
-                        break;
-                    
-                    case 'completed':
-                    case 'completed_simulated':
-                        updateProgress(100, 'Completed!');
-                        showSuccess();
-                        break;
-                    
-                    case 'failed':
-                        showError(transaction.error || 'Failed to process your request');
-                        break;
-                    
-                    default:
-                        updateProgress(60, `Status: ${transaction.status}`);
-                        setTimeout(checkTransactionStatus, 2000);
-                }
-            } catch (error) {
-                showError('Could not connect to server. Please try again later.');
-                console.error('Error checking status:', error);
-            }
-        }
-        
-        function showCaptcha() {
-            document.getElementById('manual-captcha').classList.remove('hidden');
-            
-            // Here you would normally load a captcha widget
-            const captchaContainer = document.getElementById('captcha-container');
-            captchaContainer.innerHTML = '<div style="background:#eee;padding:20px;margin:10px 0;border-radius:5px;">Captcha would appear here</div>';
-            
-            document.getElementById('submit-captcha').addEventListener('click', submitCaptcha);
-        }
-        
-        async function submitCaptcha() {
-            // Here you would normally get the captcha token
-            const captchaToken = 'simulated-captcha-token';
-            
-            try {
-                const response = await fetch('/api/manual-submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        uid: uid,
-                        transactionId: transactionId,
-                        captchaToken: captchaToken
+            // Function to check status
+            function checkStatus() {
+                fetch(`/api/status/${transactionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Display results
+                            document.getElementById('processing').classList.add('hidden');
+                            document.getElementById('result').classList.remove('hidden');
+                            document.getElementById('homeBtn').classList.remove('hidden');
+                            
+                            // Update details
+                            document.getElementById('uid').textContent = data.data.uid;
+                            document.getElementById('amount').textContent = data.data.amount;
+                            document.getElementById('status').textContent = data.data.status;
+                            document.getElementById('transactionId').textContent = data.data.id;
+                        } else {
+                            // Show error
+                            document.getElementById('processing').innerHTML = '<p>Error: Unable to process request</p>';
+                        }
                     })
-                });
-                
-                const data = await response.json();
-                
-                if (data.status === 'success') {
-                    document.getElementById('manual-captcha').classList.add('hidden');
-                    updateProgress(80, 'Captcha verified, completing request...');
-                    setTimeout(checkTransactionStatus, 1500);
-                } else {
-                    showError(data.message || 'Failed to verify captcha');
-                }
-            } catch (error) {
-                showError('Error submitting captcha');
-                console.error('Error submitting captcha:', error);
+                    .catch(error => {
+                        console.error('Error checking status:', error);
+                        document.getElementById('processing').innerHTML = '<p>Error: Unable to connect to server</p>';
+                    });
             }
+            
+            // Start checking status after 5 seconds
+            setTimeout(() => {
+                checkStatus();
+            }, 5000);
         }
-        
-        function showSuccess() {
-            document.getElementById('success-container').classList.remove('hidden');
-            document.getElementById('check-status-btn').href = `/api/user/${uid}`;
-        }
-        
-        function showError(message) {
-            document.getElementById('error-container').classList.remove('hidden');
-            document.getElementById('error-message').textContent = message || 'Unknown error occurred';
-            progressBar.style.backgroundColor = '#ff5f6d';
-        }
-        
-        // Start checking status
-        if (transactionId) {
-            setTimeout(checkTransactionStatus, 1000);
-        } else {
-            showError('No transaction ID provided');
-        }
-        
-        // Retry button functionality
-        document.getElementById('retry-btn').addEventListener('click', function() {
-            window.location.href = '/';
-        });
     </script>
 </body>
 </html>
